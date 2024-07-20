@@ -62,7 +62,6 @@ jobs:
       id: generated_version
       run: |
         VERSION=$(git describe --tags $(git rev-list --tags --max-count=1))
-        echo "version=$VERSION" >> $GITHUB_ENV
         echo "version=$VERSION" >> $GITHUB_OUTPUT
     
     - name: Echo the determined version
