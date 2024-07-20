@@ -23,7 +23,7 @@ runs:
       shell: bash
 
     - name: Login to Docker Hub
-      uses: docker-login
+      uses: ./.github/workflows/actions/docker-login
 
     - name: Pull Docker image
       run: docker pull ${{ inputs.image-name }}:latest

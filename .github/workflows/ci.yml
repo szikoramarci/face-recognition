@@ -16,14 +16,14 @@ jobs:
     runs-on: ubuntu-latest    
     steps:
     - name: Run Testing Action
-      uses: actions/test   
+      uses: ./.github/workflows/actions/test   
 
   build-and-push:
     needs: test
     runs-on: ubuntu-latest
     steps:
     - name: Run Building And Pushing Action
-      uses: actions/build-and-push  
+      uses: ./.github/workflows/actions/build-and-push  
       with:
         image-name: $docker_image_name
         
@@ -32,6 +32,6 @@ jobs:
     runs-on: ubuntu-latest
     steps: 
     - name: Run Security Scan Action
-      uses: actions/security-scan
+      uses: ./.github/workflows/actions/security-scan
       with:
           image-name: $docker_image_name
