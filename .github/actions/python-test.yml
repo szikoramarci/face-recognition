@@ -1,19 +1,21 @@
 name: 'Python Test'
 description: 'Sets up Python, installs dependencies, lints, and runs tests.'
+inputs:
+  python-version:
+    description: 'Version of the python'
+    required: true
 
 runs:
   using: "composite"
-  strategy:
-      matrix:
-        python-version: ["3.7", "3.8", "3.9", "3.10"]
+  
   steps:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Set up Python ${{ matrix.python-version }}
+    - name: Set up Python ${{ inputs.python-version }}
       uses: actions/setup-python@v2
       with:
-        python-version: ${{ matrix.python-version }}
+        python-version: ${{ inputs.python-version }}
 
     - name: Install dependencies
       run: |
