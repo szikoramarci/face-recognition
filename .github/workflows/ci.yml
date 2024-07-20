@@ -8,73 +8,30 @@ on:
     branches:
       - main
 
+env:
+  docker_image_name: szikoramarci/face-recognition
+
 jobs:
   test:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ["3.7", "3.8", "3.9", "3.10"]
-
+    runs-on: ubuntu-latest    
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
+    - name: Run Testing Action
+      uses: actions/test   
 
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-
-    - name: Lint with flake8
-      run: |
-        flake8 src
-
-    - name: Test with pytest
-      run: |
-        pytest
-
-  build-and-scan:
+  build-and-push:
     needs: test
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
-
-    - name: Build Docker image
-      run: docker build -t szikoramarci/face-recognition:latest .
-
-    - name: Install Trivy
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y apt-transport-https gnupg lsb-release
-        curl -fsSL https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
-        echo deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) stable | sudo tee /etc/apt/sources.list.d/trivy.list
-        sudo apt-get update
-        sudo apt-get install trivy
-
-    - name: Run Trivy vulnerability scanner
-      run: trivy image --exit-code 1 --severity HIGH,CRITICAL yourusername/yourimagename:latest
-
-
-  build-and-push:
-    needs: build-and-scan
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
-
-    - name: Build Docker image
-      run: docker build -t szikoramarci/face-recognition:latest .
-
-    - name: Login to Docker Hub
-      uses: docker/login-action@v3
+    - name: Run Building And Pushing Action
+      uses: actions/build-and-push  
       with:
-        username: ${{ secrets.DOCKER_HUB_USERNAME }}
-        password: ${{ secrets.DOCKER_HUB_TOKEN }}   
-
-    - name: Push Docker image
-      run: docker push szikoramarci/face-recognition:latest
+        image-name: $docker_image_name
+        
+  security-scan:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps: 
+    - name: Run Security Scan Action
+      uses: actions/security-scan
+      with:
+          image-name: $docker_image_name

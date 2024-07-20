@@ -1,0 +1,33 @@
+name: 'Trivy Security Scan'
+description: 'Perform a security scan on a Docker image using Trivy.'
+inputs:
+  image-name:
+    description: 'Docker image to scan'
+    required: true
+  severity-level:
+    description: 'Severity level of vulnerabilities to detect'
+    required: false
+    default: 'HIGH,CRITICAL'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Install Trivy
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y wget apt-transport-https gnupg lsb-release
+        wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
+        echo deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) stable | sudo tee /etc/apt/sources.list.d/trivy.list
+        sudo apt-get update
+        sudo apt-get install trivy
+      shell: bash
+
+    - name: Login to Docker Hub
+      uses: docker-login
+
+    - name: Pull Docker image
+      run: docker pull ${{ inputs.image-name }}:latest
+
+    - name: Run Trivy Scan
+      run: trivy image --severity ${{ inputs.severity-level }} ${{ inputs.image-name }}
+      shell: bash
