@@ -11,6 +11,9 @@ on:
 env:
   docker_image_name: szikoramarci/face-recognition
 
+permissions:
+  contents: write
+
 jobs:
   test:
     runs-on: ubuntu-latest    
@@ -82,7 +85,10 @@ jobs:
         output: 'dependency-results.sbom.json'
         vuln-type: 'os,library'
         severity: 'CRITICAL,HIGH'
-        github-pat: ${{ secrets.GITHUB_TOKEN }}         
+        github-pat: ${{ secrets.GITHUB_TOKEN }}   
+      env:
+        TRIVY_USERNAME: "image_registry_admin_username"
+        TRIVY_PASSWORD: "image_registry_admin_password"      
 
     - name: Upload trivy report as a Github artifact
       uses: actions/upload-artifact@v4
