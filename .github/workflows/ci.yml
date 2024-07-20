@@ -58,12 +58,18 @@ jobs:
         CUSTOM_TAG_PREFIX: ""
         WITH_V: true
 
-    - name: Generate new version
-      id: generated-version
-      run: echo "version=$(git describe --tags $(git rev-list --tags --max-count=1))" >> $GITHUB_ENV
+    - name: Determine version
+      id: set_version
+      run: |
+        VERSION=$(git describe --tags $(git rev-list --tags --max-count=1))
+        echo "version=$VERSION" >> $GITHUB_ENV
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
 
-    - name: Output new version
-      run: echo "New version is ${{ steps.generated-version.outputs.version }}"
+    - name: Use the Version in Same Job
+      run: echo "The version is $VERSION"
+    
+    - name: Use the Output Version in Subsequent Step
+      run: echo "The output version is ${{ steps.set_version.outputs.version }}"
 
   build-and-push:
     needs: versioning
