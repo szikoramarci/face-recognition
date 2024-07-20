@@ -43,7 +43,7 @@ jobs:
   versioning:
     needs: test
     outputs:
-      version: ${{ steps.generated-version.outputs.version }}
+      version: ${{ steps.generated_version.outputs.version }}
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
@@ -59,17 +59,14 @@ jobs:
         WITH_V: true
 
     - name: Determine version
-      id: set_version
+      id: generated_version
       run: |
         VERSION=$(git describe --tags $(git rev-list --tags --max-count=1))
         echo "version=$VERSION" >> $GITHUB_ENV
         echo "version=$VERSION" >> $GITHUB_OUTPUT
-
-    - name: Use the Version in Same Job
-      run: echo "The version is $VERSION"
     
-    - name: Use the Output Version in Subsequent Step
-      run: echo "The output version is ${{ steps.set_version.outputs.version }}"
+    - name: Echo the determined version
+      run: echo "The current version is ${{ steps.generated_version.outputs.version }}"
 
   build-and-push:
     needs: versioning
