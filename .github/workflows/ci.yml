@@ -76,7 +76,7 @@ jobs:
     - name: Run Trivy vulnerability scanner
       uses: aquasecurity/trivy-action@0.20.0
       with:
-        image-ref: '$docker_image_name:latest'
+        image-ref: 'szikoramarci/face-recognition:latest'
         scan-type: image
         format: 'table'
         exit-code: '1'
