@@ -29,6 +29,8 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
     - name: Run Building And Pushing Action
       uses: ./.github/actions/build-and-push
       with:
@@ -38,6 +40,8 @@ jobs:
     needs: build-and-push
     runs-on: ubuntu-latest
     steps: 
+    - name: Checkout repository
+      uses: actions/checkout@v2
     - name: Run Security Scan Action
       uses: ./.github/actions/security-scan
       with:

@@ -7,10 +7,7 @@ inputs:
 
 
 runs:
-  using: "composite"
-  - name: Checkout repository
-    uses: actions/checkout@v2
-
+  using: "composite"  
   - name: Build Docker image
     run: docker build -t ${{ inputs.image-name }}:latest .
 
