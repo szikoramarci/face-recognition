@@ -1,9 +1,9 @@
 name: 'Docker Build and Push'
 description: 'Builds a Docker image and pushes it to Docker Hub.'
 inputs:
-image-name:
-  description: 'Name of the Docker image to build and push.'
-    required: true
+  image-name:
+    description: 'Name of the Docker image to build and push.'
+      required: true
 
 
 runs:
