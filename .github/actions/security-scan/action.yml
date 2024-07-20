@@ -10,7 +10,7 @@ inputs:
     default: 'HIGH,CRITICAL'
 
 runs:
-  using: 'composite'
+  using: "composite"
   steps:
     - name: Install Trivy
       run: |

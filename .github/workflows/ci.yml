@@ -20,6 +20,7 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
+
     - name: Run Testing Action
       uses: ./.github/actions/python-test
       with:
@@ -31,6 +32,7 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
+
     - name: Run Building And Pushing Action
       uses: ./.github/actions/build-and-push
       with:
@@ -42,6 +44,7 @@ jobs:
     steps: 
     - name: Checkout repository
       uses: actions/checkout@v2
+      
     - name: Run Security Scan Action
       uses: ./.github/actions/security-scan
       with:
