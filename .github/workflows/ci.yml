@@ -10,6 +10,8 @@ on:
 
 env:
   docker_image_name: szikoramarci/face-recognition
+  docker_hub_username: ${{ secrets.DOCKER_USERNAME }}
+  docker_hub_token: ${{ secrets.DOCKER_PASSWORD }}
 
 jobs:
   test:
@@ -37,6 +39,8 @@ jobs:
       uses: ./.github/actions/build-and-push
       with:
         image-name: $docker_image_name
+        docker-hub-username: $docker_hub_username
+        docker-hub-token: $docker_hub_token
         
   security-scan:
     needs: build-and-push
@@ -49,3 +53,5 @@ jobs:
       uses: ./.github/actions/security-scan
       with:
           image-name: $docker_image_name
+          docker-hub-username: $docker_hub_username
+          docker-hub-token: $docker_hub_token

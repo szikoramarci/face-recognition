@@ -4,6 +4,12 @@ inputs:
   image-name:
     description: 'Name of the Docker image to build and push.'
     required: true
+  docker-hub-username: 
+    description: 'Username of the Docker Hub.'
+    required: true
+  docker-hub-token: 
+    description: 'Access tokan of the Docker Hub.'
+    required: true
 
 
 runs:
@@ -15,6 +21,9 @@ runs:
 
   - name: Login to Docker Hub
     uses: ./.github/actions/docker-login
+    with:
+      docker-hub-username: ${{ inputs.docker-hub-username }}
+      docker-hub-token: ${{ inputs.docker-hub-token }}
 
   - name: Push Docker image
     run: docker push ${{ inputs.image-name }}:latest
