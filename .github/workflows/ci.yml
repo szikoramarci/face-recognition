@@ -23,10 +23,21 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Run Testing Action
-      uses: ./.github/actions/python-test
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Lint with flake8
+      run: flake8 src
+
+    - name: Run tests with pytest
+      run: pytest
 
   build-and-push:
     needs: test
@@ -35,12 +46,18 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    - name: Run Building And Pushing Action
-      uses: ./.github/actions/build-and-push
+    - name: Build Docker image
+      run: docker build -t $docker_image_name:latest .
+      shell: bash
+
+    - name: Login to Docker Hub
+      uses: docker/login-action@v3
       with:
-        image-name: $docker_image_name
-        docker-hub-username: $docker_hub_username
-        docker-hub-token: $docker_hub_token
+        username: $docker_hub_username
+        password: $docker_hub_token
+    
+    - name: Push Docker image
+      run: docker push $docker_image_name:latest
         
   security-scan:
     needs: build-and-push
@@ -48,10 +65,17 @@ jobs:
     steps: 
     - name: Checkout repository
       uses: actions/checkout@v2
-      
-    - name: Run Security Scan Action
-      uses: ./.github/actions/security-scan
+
+    - name: Login to Docker Hub
+      uses: docker/login-action@v3
       with:
-          image-name: $docker_image_name
-          docker-hub-username: $docker_hub_username
-          docker-hub-token: $docker_hub_token
+        username: $docker_hub_username
+        password: $docker_hub_token
+      
+    - name: Pull Docker image
+      run: docker pull $docker_image_name:latest
+
+    - name: Run Trivy Scan
+      run: trivy image --severityHIGH,CRITICAL docker.io/$docker_image_name:latest
+      shell: bash
+       
