@@ -79,7 +79,7 @@ jobs:
     - name: Run Trivy vulnerability scanner
       uses: aquasecurity/trivy-action@0.20.0
       with:
-        image-ref: 'szikoramarci/face-recognition:latest'
+        image-ref: '${{ env.docker_image_name }}'
         scan-type: image
         format: 'github'
         output: 'dependency-results.sbom.json'
