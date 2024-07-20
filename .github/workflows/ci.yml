@@ -43,7 +43,7 @@ jobs:
   versioning:
     needs: test
     outputs:
-      version: ${{ steps.get_version.outputs.version }}
+      version: ${{ steps.generated-version.outputs.version }}
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
@@ -58,9 +58,9 @@ jobs:
         CUSTOM_TAG_PREFIX: ""
         WITH_V: true
 
-    - name: Get the new version tag
-      run: echo "The new version is $(git describe --tags $(git rev-list --tags --max-count=1))"
-      id: get_version
+    - name: Generate new version
+      id: generated-version
+      run: echo "::set-output name=version::$(git describe --tags $(git rev-list --tags --max-count=1))"
 
   build-and-push:
     needs: versioning
