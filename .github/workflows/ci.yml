@@ -37,8 +37,31 @@ jobs:
       run: |
         pytest
 
-  build-and-push:
+  build-and-scan:
     needs: test
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Build Docker image
+      run: docker build -t szikoramarci/face-recognition:latest .
+
+    - name: Install Trivy
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y apt-transport-https gnupg lsb-release
+        curl -fsSL https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
+        echo deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) stable | sudo tee /etc/apt/sources.list.d/trivy.list
+        sudo apt-get update
+        sudo apt-get install trivy
+
+    - name: Run Trivy vulnerability scanner
+      run: trivy image --exit-code 1 --severity HIGH,CRITICAL yourusername/yourimagename:latest
+
+
+  build-and-push:
+    needs: build-and-scan
     runs-on: ubuntu-latest
     steps:
     - name: Checkout repository
