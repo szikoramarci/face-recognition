@@ -11,9 +11,11 @@ runs:
   steps: 
   - name: Build Docker image
     run: docker build -t ${{ inputs.image-name }}:latest .
+    shell: bash
 
   - name: Login to Docker Hub
     uses: ./.github/actions/docker-login
 
   - name: Push Docker image
     run: docker push ${{ inputs.image-name }}:latest
+    shell: bash
