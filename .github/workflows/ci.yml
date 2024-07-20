@@ -40,15 +40,37 @@ jobs:
     - name: Run tests with pytest
       run: pytest
 
-  build-and-push:
+  versioning:
     needs: test
+    outputs:
+      version: ${{ steps.get_version.outputs.version }}
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Bump version and push tag
+      uses: anothrNick/github-tag-action@1.36.0
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        DEFAULT_BUMP: patch
+        RELEASE_BRANCHES: main
+        CUSTOM_TAG_PREFIX: ""
+        WITH_V: true
+
+    - name: Get the new version tag
+      run: echo "The new version is $(git describe --tags $(git rev-list --tags --max-count=1))"
+      id: get_version
+
+  build-and-push:
+    needs: versioning
     runs-on: ubuntu-latest
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
 
     - name: Build Docker image
-      run: docker build -t ${{ env.docker_image_name }}:latest .
+      run: docker build -t ${{ env.docker_image_name }}:${{ needs.versioning.outputs.version }} .
       shell: bash
 
     - name: Login to Docker Hub
@@ -58,10 +80,10 @@ jobs:
         password: ${{ secrets.DOCKER_HUB_TOKEN }}
     
     - name: Push Docker image
-      run: docker push ${{ env.docker_image_name }}:latest
+      run: docker push ${{ env.docker_image_name }}:${{ needs.versioning.outputs.version }}
         
   security-scan:
-    needs: build-and-push
+    needs: [build-and-push, versioning]
     runs-on: ubuntu-latest
     steps: 
     - name: Checkout repository
@@ -74,12 +96,12 @@ jobs:
         password: ${{ secrets.DOCKER_HUB_TOKEN }}
       
     - name: Pull Docker image
-      run: docker pull ${{ env.docker_image_name }}:latest
+      run: docker pull ${{ env.docker_image_name }}:${{ needs.versioning.outputs.version }}
 
     - name: Run Trivy vulnerability scanner
       uses: aquasecurity/trivy-action@0.20.0
       with:
-        image-ref: '${{ env.docker_image_name }}:latest'
+        image-ref: '${{ env.docker_image_name }}:${{ needs.versioning.outputs.version }}'
         scan-type: image
         format: 'github'
         output: 'dependency-results.sbom.json'
