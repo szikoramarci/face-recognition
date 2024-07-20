@@ -60,7 +60,7 @@ jobs:
 
     - name: Generate new version
       id: generated-version
-      run: echo "version=$(git describe --tags $(git rev-list --tags --max-count=1))" >> GITHUB_OUTPUT
+      run: echo "version=$(git describe --tags $(git rev-list --tags --max-count=1))" >> $env:GITHUB_OUTPUT
 
     - name: Output new version
       run: echo "New version is ${{ steps.generated-version.outputs.version }}"
