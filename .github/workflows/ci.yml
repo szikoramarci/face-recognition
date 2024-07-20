@@ -10,8 +10,8 @@ on:
 
 env:
   docker_image_name: szikoramarci/face-recognition
-  docker_hub_username: ${{ secrets.DOCKER_USERNAME }}
-  docker_hub_token: ${{ secrets.DOCKER_PASSWORD }}
+  docker_hub_username: ${{ secrets.DOCKER_HUB_USERNAME }}
+  docker_hub_token: ${{ secrets.DOCKER_HUB_TOKEN }}
 
 jobs:
   test:
