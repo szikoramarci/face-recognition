@@ -15,7 +15,7 @@ runs:
     run: docker build -t ${{ inputs.image-name }}:latest .
 
   - name: Login to Docker Hub
-    uses: ./.github/workflows/actions/docker-login
+    uses: ./.github/workflows/actions/docker-login.yml
 
   - name: Push Docker image
     run: docker push ${{ inputs.image-name }}:latest
