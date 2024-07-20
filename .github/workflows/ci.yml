@@ -21,7 +21,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
     - name: Run Testing Action
-      uses: ./.github/actions/python-test.yml
+      uses: ./.github/actions/python-test
       with:
         python-version: ${{ matrix.python-version }}
 
