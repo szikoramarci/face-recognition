@@ -73,7 +73,22 @@ jobs:
     - name: Pull Docker image
       run: docker pull $docker_image_name:latest
 
+    - name: Set up Trivy
+      run: |
+        sudo apt-get update && sudo apt-get install -y wget apt-transport-https gnupg lsb-release
+        wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
+        echo deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) stable | sudo tee /etc/apt/sources.list.d/trivy.list
+        sudo apt-get update && sudo apt-get install -y trivy
+
+    - name: Run Trivy vulnerability scanner and generate HTML report
+      run: trivy image --format template --template "@contrib/html.tpl" --output trivy-report.html $docker_image_name:latest
+
+    - name: Upload Trivy Report as an Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: Trivy HTML Report
+        path: trivy-report.html
+
     - name: Run Trivy Scan
-      run: trivy image --severityHIGH,CRITICAL docker.io/$docker_image_name:latest
-      shell: bash
+      run: trivy image --severityHIGH,CRITICAL $docker_image_name:latest
        
